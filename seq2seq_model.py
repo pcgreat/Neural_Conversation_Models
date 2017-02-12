@@ -5,7 +5,6 @@
 import random
 
 import numpy as np
-from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
 
 from  data_utils import *
@@ -89,7 +88,7 @@ class Seq2SeqModel(object):
     # The seq2seq function: we use embedding for the input and attention.
     def seq2seq_f(encoder_inputs, decoder_inputs, do_decode):
         if attention:
-            print "Attention Model"
+            print ("Attention Model")
             return embedding_attention_seq2seq(
                encoder_inputs, decoder_inputs, cell,
                num_encoder_symbols=source_vocab_size,
@@ -100,7 +99,7 @@ class Seq2SeqModel(object):
                beam_search=beam_search,
                beam_size=beam_size )
         else:
-            print "Simple Model"
+            print ("Simple Model")
             return embedding_rnn_seq2seq(
               encoder_inputs, decoder_inputs, cell,
               num_encoder_symbols=source_vocab_size,
@@ -116,10 +115,10 @@ class Seq2SeqModel(object):
     self.encoder_inputs = []
     self.decoder_inputs = []
     self.target_weights = []
-    for i in xrange(buckets[-1][0]):  # Last bucket is the biggest one.
+    for i in range(buckets[-1][0]):  # Last bucket is the biggest one.
       self.encoder_inputs.append(tf.placeholder(tf.int32, shape=[None],
                                                 name="encoder{0}".format(i)))
-    for i in xrange(buckets[-1][1] + 1):
+    for i in range(buckets[-1][1] + 1):
       self.decoder_inputs.append(tf.placeholder(tf.int32, shape=[None],
                                                 name="decoder{0}".format(i)))
       self.target_weights.append(tf.placeholder(tf.float32, shape=[None],
@@ -127,7 +126,7 @@ class Seq2SeqModel(object):
 
     # Our targets are decoder inputs shifted by one.
     targets = [self.decoder_inputs[i + 1]
-               for i in xrange(len(self.decoder_inputs) - 1)]
+               for i in range(len(self.decoder_inputs) - 1)]
 
     # Training outputs and losses.
     if forward_only:
@@ -144,7 +143,7 @@ class Seq2SeqModel(object):
                   softmax_loss_function=softmax_loss_function)
               # If we use output projection, we need to project outputs for decoding.
               if output_projection is not None:
-                    for b in xrange(len(buckets)):
+                    for b in range(len(buckets)):
                       self.outputs[b] = [
                           tf.matmul(output, output_projection[0]) + output_projection[1]
                           for output in self.outputs[b]
@@ -164,7 +163,7 @@ class Seq2SeqModel(object):
       self.gradient_norms = []
       self.updates = []
       opt = tf.train.GradientDescentOptimizer(self.learning_rate)
-      for b in xrange(len(buckets)):
+      for b in range(len(buckets)):
         gradients = tf.gradients(self.losses[b], params)
         clipped_gradients, norm = tf.clip_by_global_norm(gradients,
                                                          max_gradient_norm)
@@ -172,7 +171,7 @@ class Seq2SeqModel(object):
         self.updates.append(opt.apply_gradients(
             zip(clipped_gradients, params), global_step=self.global_step))
 
-    self.saver = tf.train.Saver(tf.all_variables())
+    self.saver = tf.train.Saver(tf.global_variables())
 
   def step(self, session, encoder_inputs, decoder_inputs, target_weights,
            bucket_id, forward_only, beam_search):
@@ -208,9 +207,9 @@ class Seq2SeqModel(object):
 
     # Input feed: encoder inputs, decoder inputs, target_weights, as provided.
     input_feed = {}
-    for l in xrange(encoder_size):
+    for l in range(encoder_size):
       input_feed[self.encoder_inputs[l].name] = encoder_inputs[l]
-    for l in xrange(decoder_size):
+    for l in range(decoder_size):
       input_feed[self.decoder_inputs[l].name] = decoder_inputs[l]
       input_feed[self.target_weights[l].name] = target_weights[l]
 
@@ -230,7 +229,7 @@ class Seq2SeqModel(object):
         else:
             output_feed = [self.losses[bucket_id]]
 
-        for l in xrange(decoder_size):  # Output logits.
+        for l in range(decoder_size):  # Output logits.
             output_feed.append(self.outputs[bucket_id][l])
     # print bucket_id
     outputs = session.run(output_feed, input_feed)
@@ -263,7 +262,7 @@ class Seq2SeqModel(object):
 
     # Get a random batch of encoder and decoder inputs from data,
     # pad them if needed, reverse encoder inputs and add GO to decoder.
-    for _ in xrange(self.batch_size):
+    for _ in range(self.batch_size):
       encoder_input, decoder_input = random.choice(data[bucket_id])
 
       # Encoder inputs are padded and then reversed.
@@ -279,20 +278,20 @@ class Seq2SeqModel(object):
     batch_encoder_inputs, batch_decoder_inputs, batch_weights = [], [], []
 
     # Batch encoder inputs are just re-indexed encoder_inputs.
-    for length_idx in xrange(encoder_size):
+    for length_idx in range(encoder_size):
       batch_encoder_inputs.append(
           np.array([encoder_inputs[batch_idx][length_idx]
-                    for batch_idx in xrange(self.batch_size)], dtype=np.int32))
+                    for batch_idx in range(self.batch_size)], dtype=np.int32))
 
     # Batch decoder inputs are re-indexed decoder_inputs, we create weights.
-    for length_idx in xrange(decoder_size):
+    for length_idx in range(decoder_size):
       batch_decoder_inputs.append(
           np.array([decoder_inputs[batch_idx][length_idx]
-                    for batch_idx in xrange(self.batch_size)], dtype=np.int32))
+                    for batch_idx in range(self.batch_size)], dtype=np.int32))
 
       # Create target_weights to be 0 for targets that are padding.
       batch_weight = np.ones(self.batch_size, dtype=np.float32)
-      for batch_idx in xrange(self.batch_size):
+      for batch_idx in range(self.batch_size):
         # We set weight to 0 if the corresponding target is a PAD symbol.
         # The corresponding target is decoder_input shifted by 1 forward.
         if length_idx < decoder_size - 1:
