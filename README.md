@@ -1,20 +1,15 @@
-# Neural_Conversation_Models (Tensorflow 1.0)
-
+# Neural Conversation Models (Tensorflow 1.0)
 
 * This implementation is forked from https://github.com/pbhatia243/Neural_Conversation_Models.git
-* Now it supports Python3 and Tensorflow 1.0
 
+* It runs on Tensorflow 1.0 and Python3
 
-------------------------------------
-This implementation contains an extension of seq2seq tutorial for conversation models in Tensorflow:
-
-1. Option to use Beam Search and Beam Size for decoding
-    
-2. Currently, it supports
-    - Simple seq2seq  models
-    - Attention based seq2seq models
-    
-3. To get better results use beam search during decoding / inference 
+* This implementation contains an extension of seq2seq tutorial for conversation models in Tensorflow:
+    1. Option to use Beam Search and Beam Size for decoding
+    2. Currently, it supports
+        - Simple seq2seq  models
+        - Attention based seq2seq models
+    3. To get better results use beam search during decoding / inference
 
 
 Prerequisites
