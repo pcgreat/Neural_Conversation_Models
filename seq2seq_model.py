@@ -84,7 +84,7 @@ class Seq2SeqModel(object):
             single_cell = BasicLSTMCell(size)
         cell = single_cell
         if num_layers > 1:
-            cell = MultiRNNCell([single_cell] * num_layers)
+            cell = MultiRNNCell([single_cell] * num_layers, state_is_tuple=False) # note: when state_is_tuple=True, returns 3 final_states as 3 layers; when False, only return 1
 
         # The seq2seq function: we use embedding for the input and attention.
         def seq2seq_f(encoder_inputs, decoder_inputs, do_decode):

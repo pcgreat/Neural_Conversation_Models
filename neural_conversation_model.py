@@ -43,7 +43,7 @@ tf.app.flags.DEFINE_integer("max_train_data_size", 0,
 tf.app.flags.DEFINE_integer("steps_per_checkpoint", 10,
                             "How many training steps to do per checkpoint.")
 tf.app.flags.DEFINE_integer("beam_size", 100,
-                            "How many training steps to do per checkpoint.")
+                            "beam size.")
 tf.app.flags.DEFINE_boolean("beam_search", False,
                             "Set to True for beam_search.")
 tf.app.flags.DEFINE_boolean("decode", False,
@@ -101,12 +101,14 @@ def create_model(session, forward_only, beam_search, beam_size=10, attention=Tru
 
     # ckpt.model_checkpoint_path ="./big_models/chat_bot.ckpt-183600"
     # print ckpt.model_checkpoint_path
-    if ckpt and tf.gfile.Exists(ckpt.model_checkpoint_path):
+    if ckpt and ckpt.model_checkpoint_path:
         print("Reading model parameters from %s" % ckpt.model_checkpoint_path)
         model.saver.restore(session, ckpt.model_checkpoint_path)
     else:
-        print("Created model with fresh parameters.")
-        session.run(tf.global_variables_initializer())
+        raise ValueError("model file not loaded correctly: {}".format(ckpt.model_checkpoint_path))
+        # Don't create fresh model if cannot be loaded
+        # print("Created model with fresh parameters.")
+        # session.run(tf.global_variables_initializer())
     return model
 
 
@@ -237,7 +239,7 @@ def decode():
             sentence = sys.stdin.readline()
             while sentence:
                 # Get token-ids for the input sentence.
-                token_ids = sentence_to_token_ids(tf.compat.as_bytes(sentence), vocab)
+                token_ids = sentence_to_token_ids(tf.compat.as_str(sentence), vocab)
                 # Which bucket does it belong to?
                 bucket_id = min([b for b in range(len(_buckets))
                                  if _buckets[b][0] > len(token_ids)])
@@ -253,7 +255,7 @@ def decode():
                 paths = []
                 for kk in range(beam_size):
                     paths.append([])
-                curr = range(beam_size)
+                curr = list(range(beam_size))
                 num_steps = len(path)
                 for i in range(num_steps - 1, -1, -1):
                     for kk in range(beam_size):

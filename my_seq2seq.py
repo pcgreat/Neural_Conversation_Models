@@ -24,6 +24,8 @@ translation, or even constructing automated replies to emails.
 * model_with_buckets: A convenience function to create models with bucketing
     (see the tutorial above for an explanation of why and how to use it).
 """
+import pdb
+
 import tensorflow as tf
 from tensorflow.contrib.rnn import EmbeddingWrapper, OutputProjectionWrapper
 from tensorflow.contrib.rnn import static_rnn
@@ -219,8 +221,9 @@ def beam_rnn_decoder(decoder_inputs, initial_state, cell, loop_function=None,
 
             outputs.append(tf.argmax(nn_ops.xw_plus_b(
                 output, output_projection[0], output_projection[1]), dimension=1))
-    return outputs, state, tf.reshape(tf.concat(beam_path, axis=0), [-1, beam_size]), tf.reshape(tf.concat(beam_symbols, axis=0),
-                                                                                            [-1, beam_size])
+    return outputs, state, tf.reshape(tf.concat(beam_path, axis=0), [-1, beam_size]), tf.reshape(
+        tf.concat(beam_symbols, axis=0),
+        [-1, beam_size])
 
 
 def embedding_rnn_decoder(decoder_inputs, initial_state, cell, num_symbols,
@@ -667,8 +670,9 @@ def beam_attention_decoder(decoder_inputs, initial_state, attention_states, cell
             outputs.append(tf.argmax(nn_ops.xw_plus_b(
                 output, output_projection[0], output_projection[1]), dimension=1))
 
-    return outputs, state, tf.reshape(tf.concat(beam_path, axis=0), [-1, beam_size]), tf.reshape(tf.concat(beam_symbols, axis=0),
-                                                                                            [-1, beam_size])
+    return outputs, state, tf.reshape(tf.concat(beam_path, axis=0), [-1, beam_size]), tf.reshape(
+        tf.concat(beam_symbols, axis=0),
+        [-1, beam_size])
 
 
 def embedding_attention_decoder(decoder_inputs, initial_state, attention_states,
@@ -809,6 +813,7 @@ def embedding_attention_seq2seq(encoder_inputs, decoder_inputs, cell,
         encoder_cell = EmbeddingWrapper(
             cell, embedding_classes=num_encoder_symbols,
             embedding_size=embedding_size)
+        # length of encoder_state is 3
         encoder_outputs, encoder_state = static_rnn(
             encoder_cell, encoder_inputs, dtype=dtype)
         print("Number of Symbols")
