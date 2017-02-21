@@ -1,4 +1,7 @@
-# Neural_Conversation_Models
+# Neural_Conversation_Models (Tensorflow 1.0)
+=================================
+This implementation is forked from https://github.com/pbhatia243/Neural_Conversation_Models.git
+Now it supports Python3 and Tensorflow 1.0
 =================================
 This implementation contains an extension of seq2seq tutorial for conversation models in Tensorflow:
 

@@ -14,10 +14,15 @@ See the following papers for more information on neural translation models.
 
 import codecs
 import math
+import os
 import sys
 import time
 
-from  seq2seq_model import *
+import numpy as np
+import tensorflow as tf
+
+from data_utils import initialize_vocabulary, EOS_ID, sentence_to_token_ids, create_vocabulary
+from seq2seq_model import Seq2SeqModel
 
 tf.app.flags.DEFINE_float("learning_rate", 0.5, "Learning rate.")
 tf.app.flags.DEFINE_float("learning_rate_decay_factor", 0.99,
@@ -26,7 +31,7 @@ tf.app.flags.DEFINE_float("max_gradient_norm", 5.0,
                           "Clip gradients to this norm.")
 tf.app.flags.DEFINE_integer("batch_size", 64,
                             "Batch size to use during training.")
-tf.app.flags.DEFINE_integer("size", 128, "Size of each model layer.") # 512
+tf.app.flags.DEFINE_integer("size", 128, "Size of each model layer.")  # 512
 tf.app.flags.DEFINE_integer("num_layers", 3, "Number of layers in the model.")
 tf.app.flags.DEFINE_integer("en_vocab_size", 40000, "English vocabulary size.")
 tf.app.flags.DEFINE_string("train_dir", "./tmp/", "Training directory.")
